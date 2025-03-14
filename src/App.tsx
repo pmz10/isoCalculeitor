@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, StyleSheet, StatusBar } from 'react-native';
 import CalculatorScreen from './presentation/Screens/CalculatorScreen';
+import { styles } from './Config/Theme/app-theme';
 
 const App = () => {
   return (
-    <View style={styles.container}>
+    <View style={styles.background}>
       <StatusBar
         barStyle={'light-content'}
         backgroundColor={'black'}
@@ -13,13 +14,5 @@ const App = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 export default App;
