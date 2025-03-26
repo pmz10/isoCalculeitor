@@ -1,9 +1,19 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+
+enum Operator {
+    add,
+    subtract,
+    multiply,
+    divide
+}
 
 
 export const useCalculeitor = () => {
 
-    const [number, setNumber] = useState('0')
+    const [number, setNumber] = useState('0');
+    const [prevNumber, setPrevNumber] = useState('0');
+
+    const lastOperation = useRef<Operator | null>(null);
 
     const buildNumber = (numberString: string) => {
 
@@ -39,38 +49,98 @@ export const useCalculeitor = () => {
 
     };
 
-    const clean = () =>{
+    const clean = () => {
         setNumber('0');
+        setPrevNumber('0');
     }
 
-    const toggleSign = () =>{
-        if (number.includes('-') ){
-            return setNumber(number.replace('-',''))
+    const toggleSign = () => {
+        if (number.includes('-')) {
+            return setNumber(number.replace('-', ''))
         }
         setNumber('-' + number);
     }
 
-    const deleteOperation = () =>{
+    const deleteOperation = () => {
         let currentSing = ""
         let temporalNumber = number;
 
-        if(number.includes('-') ){
+        if (number.includes('-')) {
             currentSing = '-';
             temporalNumber = number.substring(1);
         }
-        if(temporalNumber.length > 1) {
-            return setNumber(currentSing + temporalNumber.slice(0,-1))
+        if (temporalNumber.length > 1) {
+            return setNumber(currentSing + temporalNumber.slice(0, -1))
         }
         setNumber('0');
     }
+
+
+    const setLastNumber = () => {
+        if (number.endsWith('.')) {
+            setPrevNumber(number.slice(0, -1));
+        } else {
+            setPrevNumber(number);
+        }
+        setNumber('0');
+    }
+
+    const divideOperation = () => {
+        setLastNumber();
+        lastOperation.current = Operator.divide;
+    }
+
+    const multiplyOperation = () => {
+        setLastNumber();
+        lastOperation.current = Operator.multiply;
+    }
+
+    const subtractOperation = () => {
+        setLastNumber();
+        lastOperation.current = Operator.subtract;
+    }
+
+    const addOperation = () => {
+        setLastNumber();
+        lastOperation.current = Operator.add;
+    }
+
+    const calculateResult = () => {
+        const num1 = Number(number);
+        const num2 = Number(prevNumber);
+
+        switch (lastOperation.current) {
+            case Operator.add:
+                setNumber(`${num1 + num2}`);
+                break;
+            case Operator.subtract:
+                setNumber(`${num2 - num1}`);
+                break;
+            case Operator.multiply:
+                setNumber(`${num1 * num2}`);
+                break;
+            case Operator.divide:
+                setNumber(`${num2 / num1}`);
+                break;
+        }
+
+        setPrevNumber('0');
+    }
+
     return {
         //Propiedades
         number,
+        prevNumber,
 
         //Metodos
         buildNumber,
-        toggleSign, 
+        toggleSign,
         clean,
         deleteOperation,
+        divideOperation,
+        multiplyOperation,
+        subtractOperation,
+        addOperation,
+        calculateResult,
     }
 }
